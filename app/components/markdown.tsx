@@ -210,6 +210,13 @@ function CustomCode(props: { children: any; className?: string }) {
     }
     return null;
   };
+
+  const isGraph = /class='graph'/.test(props.children?.[0]);
+
+  if (isGraph) {
+    return <div>特殊块捕获</div>;
+  }
+
   return (
     <>
       <code

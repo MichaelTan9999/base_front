@@ -25,6 +25,8 @@ import { IconButton } from "./button";
 import { useAppConfig } from "../store/config";
 import clsx from "clsx";
 
+import { Graph } from "bi-graph";
+
 export function Mermaid(props: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [hasError, setHasError] = useState(false);
@@ -213,7 +215,24 @@ function CustomCode(props: { children: any; className?: string }) {
 
   const isGraph = /class='graph'/.test(props.children?.[0]);
 
+  const dataReg = /data='(.*?)'/;
+
+  // const data = (props.children?.[0]).match(dataReg)
+
+  // try {
+  //   console.log('data:\n', JSON.parse(data[1]));
+  //   return <div>测试</div>;
+  // } catch (e) {
+  //   console.log('parse failed');
+  // }
+
   if (isGraph) {
+    try {
+      const data = (props.children?.[0]).match(dataReg);
+      return <Graph data={JSON.parse(data[1])} />;
+    } catch {
+      console.log("failed");
+    }
     return <div>特殊块捕获</div>;
   }
 
@@ -238,7 +257,8 @@ function CustomCode(props: { children: any; className?: string }) {
 function escapeBrackets(text: string) {
   const pattern =
     /(```[\s\S]*?```|`.*?`)|\\\[([\s\S]*?[^\\])\\\]|\\\((.*?)\\\)/g;
-  return text.replace(
+
+  const value = text.replace(
     pattern,
     (match, codeBlock, squareBracket, roundBracket) => {
       if (codeBlock) {
@@ -251,6 +271,8 @@ function escapeBrackets(text: string) {
       return match;
     },
   );
+  console.log("escapeBrackets: ", value);
+  return value;
 }
 
 function tryWrapHtmlCode(text: string) {
@@ -295,7 +317,8 @@ function _MarkDownContent(props: { content: string }) {
       components={{
         pre: PreCode,
         code: CustomCode,
-        p: (pProps) => <p {...pProps} dir="auto" />,
+        div: () => <div>div</div>,
+        p: (pProps) => <p {...pProps} dir="auto" style={{ color: "red" }} />,
         a: (aProps) => {
           const href = aProps.href || "";
           if (/\.(aac|mp3|opus|wav)$/.test(href)) {

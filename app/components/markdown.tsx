@@ -25,7 +25,7 @@ import { IconButton } from "./button";
 import { useAppConfig } from "../store/config";
 import clsx from "clsx";
 
-import { Graph } from "bi-graph";
+import { Dataframe, Graph } from "bi-graph";
 
 export function Mermaid(props: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -100,6 +100,8 @@ export function PreCode(props: { children: any }) {
       setHtmlCode(refText);
     }
   }, 600);
+
+  console.log("precode children: ", props.children);
 
   const config = useAppConfig();
   const enableArtifacts =
@@ -214,6 +216,7 @@ function CustomCode(props: { children: any; className?: string }) {
   };
 
   const isGraph = /class='graph'/.test(props.children?.[0]);
+  const isDataframe = /class='dataframe'/.test(props.children?.[0]);
 
   const dataReg = /data='(.*?)'/;
 
@@ -229,10 +232,65 @@ function CustomCode(props: { children: any; className?: string }) {
   if (isGraph) {
     try {
       const data = (props.children?.[0]).match(dataReg);
-      return <Graph data={JSON.parse(data[1])} />;
+      return (
+        <div style={{ minWidth: "300px" }}>
+          <Graph data={JSON.parse(data[1])} style={{}} />
+        </div>
+      );
     } catch {
       console.log("failed");
     }
+
+    return <div>特殊块捕获</div>;
+  }
+
+  if (isDataframe) {
+    const demoData = {
+      dataSource: [
+        {
+          key: "1",
+          name: "胡彦斌",
+          age: 32,
+          address: "西湖区湖底公园1号",
+        },
+        {
+          key: "2",
+          name: "胡彦祖",
+          age: 42,
+          address: "西湖区湖底公园1号",
+        },
+      ],
+      columns: [
+        {
+          title: "姓名",
+          dataIndex: "name",
+          key: "name",
+        },
+        {
+          title: "年龄",
+          dataIndex: "age",
+          key: "age",
+        },
+        {
+          title: "住址",
+          dataIndex: "address",
+          key: "address",
+        },
+      ],
+    };
+    try {
+      const data = (props.children?.[0]).match(dataReg);
+      console.log("dataframe 数据：", JSON.parse(data[1]));
+      return (
+        <div style={{ minWidth: "300px" }}>
+          <Dataframe data={demoData} />
+        </div>
+      );
+      return <div>Dataframe</div>;
+    } catch {
+      console.log("failed");
+    }
+
     return <div>特殊块捕获</div>;
   }
 

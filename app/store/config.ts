@@ -104,6 +104,10 @@ export const DEFAULT_CONFIG = {
     temperature: 0.9,
     voice: "alloy" as Voice,
   },
+
+  customizedConfig: {
+    chatMode: 0,
+  },
 };
 
 export type ChatConfig = typeof DEFAULT_CONFIG;

@@ -70,7 +70,6 @@ import {
   getMessageImages,
   isVisionModel,
   isDalle3,
-  showPlugins,
   safeLocalStorage,
 } from "../utils";
 
@@ -452,6 +451,11 @@ function useScrollToBottom(
   };
 }
 
+enum ChatMode {
+  professional,
+  cansual,
+}
+
 export function ChatActions(props: {
   uploadImage: () => void;
   setAttachImages: (images: string[]) => void;
@@ -479,6 +483,21 @@ export function ChatActions(props: {
     const nextIndex = (themeIndex + 1) % themes.length;
     const nextTheme = themes[nextIndex];
     config.update((config) => (config.theme = nextTheme));
+  }
+
+  const [chatMode, setChatMode] = useState(ChatMode.cansual);
+
+  function changeChatMode() {
+    config.update(
+      (config) =>
+        (config.customizedConfig = {
+          ...config.customizedConfig,
+          chatMode:
+            chatMode === ChatMode.cansual
+              ? ChatMode.professional
+              : ChatMode.cansual,
+        }),
+    );
   }
 
   // stop all responses
@@ -754,7 +773,7 @@ export function ChatActions(props: {
           />
         )}
 
-        {showPlugins(currentProviderName, currentModel) && (
+        {/* {showPlugins(currentProviderName, currentModel) && (
           <ChatAction
             onClick={() => {
               if (pluginStore.getAll().length == 0) {
@@ -766,7 +785,20 @@ export function ChatActions(props: {
             text={Locale.Plugin.Name}
             icon={<PluginIcon />}
           />
-        )}
+        )} */}
+        <ChatAction
+          onClick={() => {
+            changeChatMode();
+            if (chatMode === ChatMode.cansual) {
+              setChatMode(ChatMode.professional);
+            } else {
+              setChatMode(ChatMode.cansual);
+            }
+          }}
+          text={chatMode === ChatMode.cansual ? "闲聊模式" : "专业模式"}
+          icon={chatMode === ChatMode.cansual ? <PluginIcon /> : <StyleIcon />}
+        />
+
         {showPluginSelector && (
           <Selector
             multiple
@@ -2038,7 +2070,6 @@ function _Chat() {
                 )}
                 <IconButton
                   icon={<SendWhiteIcon />}
-                  text={Locale.Chat.Send}
                   className={styles["chat-input-send"]}
                   type="primary"
                   onClick={() => doSubmit(userInput)}

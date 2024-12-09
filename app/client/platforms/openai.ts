@@ -66,6 +66,7 @@ export interface RequestPayload {
   top_p: number;
   max_tokens?: number;
   max_completion_tokens?: number;
+  customizedConfig: Record<string, any>;
 }
 
 export interface DalleRequestPayload {
@@ -232,6 +233,7 @@ export class ChatGPTApi implements LLMApi {
         top_p: !isO1 ? modelConfig.top_p : 1,
         // max_tokens: Math.max(modelConfig.max_tokens, 1024),
         // Please do not ask me why not send max_tokens, no reason, this param is just shit, I dont want to explain anymore.
+        customizedConfig: useAppConfig.getState().customizedConfig,
       };
 
       // O1 使用 max_completion_tokens 控制token数 (https://platform.openai.com/docs/guides/reasoning#controlling-costs)

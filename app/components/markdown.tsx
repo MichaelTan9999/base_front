@@ -101,7 +101,12 @@ export function PreCode(props: { children: any }) {
     }
   }, 600);
 
-  console.log("precode children: ", props.children);
+  const isGraph = /class='graph'/.test(
+    props.children?.[0]?.props?.children?.[0],
+  );
+  const isDataframe = /class='dataframe'/.test(
+    props.children?.[0]?.props?.children?.[0],
+  );
 
   const config = useAppConfig();
   const enableArtifacts =
@@ -137,16 +142,18 @@ export function PreCode(props: { children: any }) {
   return (
     <>
       <pre ref={ref}>
-        <span
-          className="copy-code-button"
-          onClick={() => {
-            if (ref.current) {
-              copyToClipboard(
-                ref.current.querySelector("code")?.innerText ?? "",
-              );
-            }
-          }}
-        ></span>
+        {!isGraph && !isDataframe && (
+          <span
+            className="copy-code-button"
+            onClick={() => {
+              if (ref.current) {
+                copyToClipboard(
+                  ref.current.querySelector("code")?.innerText ?? "",
+                );
+              }
+            }}
+          />
+        )}
         {props.children}
       </pre>
       {mermaidCode.length > 0 && (

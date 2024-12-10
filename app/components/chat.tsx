@@ -43,6 +43,7 @@ import StyleIcon from "../icons/palette.svg";
 import ShortcutkeyIcon from "../icons/shortcutkey.svg";
 import ReloadIcon from "../icons/reload.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
+import HarborCityIcon from "../icons/harbour.svg";
 import {
   ChatMessage,
   SubmitKey,
@@ -101,7 +102,7 @@ import {
   ServiceProvider,
 } from "../constant";
 import { Avatar } from "./emoji";
-import { ContextPrompts, MaskAvatar, MaskConfig } from "./mask";
+import { ContextPrompts, MaskConfig } from "./mask";
 import { useMaskStore } from "../store/mask";
 import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
 import { prettyObject } from "../utils/format";
@@ -1851,24 +1852,12 @@ function _Chat() {
                             {isUser ? (
                               <Avatar avatar={config.avatar} />
                             ) : (
-                              <>
-                                {["system"].includes(message.role) ? (
-                                  <Avatar avatar="2699-fe0f" />
-                                ) : (
-                                  <MaskAvatar
-                                    avatar={session.mask.avatar}
-                                    model={
-                                      message.model ||
-                                      session.mask.modelConfig.model
-                                    }
-                                  />
-                                )}
-                              </>
+                              <HarborCityIcon />
                             )}
                           </div>
                           {!isUser && (
                             <div className={styles["chat-model-name"]}>
-                              {message.model}
+                              harbor-city
                             </div>
                           )}
 

@@ -108,6 +108,8 @@ export function PreCode(props: { children: any }) {
     props.children?.[0]?.props?.children?.[0],
   );
 
+  console.log("PreCode, isGraph", isGraph);
+
   const config = useAppConfig();
   const enableArtifacts =
     session.mask?.enableArtifacts !== false && config.enableArtifacts;
@@ -141,8 +143,10 @@ export function PreCode(props: { children: any }) {
 
   return (
     <>
-      <pre ref={ref}>
-        {!isGraph && !isDataframe && (
+      {isGraph || isDataframe ? (
+        props.children
+      ) : (
+        <pre ref={ref}>
           <span
             className="copy-code-button"
             onClick={() => {
@@ -153,9 +157,9 @@ export function PreCode(props: { children: any }) {
               }
             }}
           />
-        )}
-        {props.children}
-      </pre>
+          {props.children}
+        </pre>
+      )}
       {mermaidCode.length > 0 && (
         <Mermaid code={mermaidCode} key={mermaidCode} />
       )}
@@ -302,7 +306,7 @@ function escapeBrackets(text: string) {
       return match;
     },
   );
-  console.log("escapeBrackets: ", value);
+  // console.log("escapeBrackets: ", value);
   return value;
 }
 
@@ -348,7 +352,6 @@ function _MarkDownContent(props: { content: string }) {
       components={{
         pre: PreCode,
         code: CustomCode,
-        div: () => <div>div</div>,
         p: (pProps) => <p {...pProps} dir="auto" style={{ color: "red" }} />,
         a: (aProps) => {
           const href = aProps.href || "";

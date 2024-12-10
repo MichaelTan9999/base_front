@@ -19,8 +19,6 @@ import SpeakIcon from "../icons/speak.svg";
 import SpeakStopIcon from "../icons/speak-stop.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 import LoadingButtonIcon from "../icons/loading.svg";
-import PromptIcon from "../icons/prompt.svg";
-import MaskIcon from "../icons/mask.svg";
 import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
 import ResetIcon from "../icons/reload.svg";
@@ -39,11 +37,9 @@ import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
-import RobotIcon from "../icons/robot.svg";
 import SizeIcon from "../icons/size.svg";
 import QualityIcon from "../icons/hd.svg";
 import StyleIcon from "../icons/palette.svg";
-import PluginIcon from "../icons/plugin.svg";
 import ShortcutkeyIcon from "../icons/shortcutkey.svg";
 import ReloadIcon from "../icons/reload.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
@@ -419,6 +415,33 @@ export function ChatAction(props: {
   );
 }
 
+export function ChatActionWithoutShrink(props: {
+  text: string;
+  classNames: string;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      className={clsx(
+        styles["chat-input-action"],
+        "clickable",
+        props.classNames,
+      )}
+      onClick={() => {
+        props.onClick();
+      }}
+      // style={
+      //   {
+      //     "--icon-width": `${width.icon}px`,
+      //     "--full-width": `${width.full}px`,
+      //   } as React.CSSProperties
+      // }
+    >
+      <div>{props.text}</div>
+    </div>
+  );
+}
+
 function useScrollToBottom(
   scrollRef: RefObject<HTMLDivElement>,
   detach: boolean = false,
@@ -622,19 +645,19 @@ export function ChatActions(props: {
           }
         />
 
-        <ChatAction
+        {/* <ChatAction
           onClick={props.showPromptHints}
           text={Locale.Chat.InputActions.Prompt}
           icon={<PromptIcon />}
-        />
+        /> */}
 
-        <ChatAction
+        {/* <ChatAction
           onClick={() => {
             navigate(Path.Masks);
           }}
           text={Locale.Chat.InputActions.Masks}
           icon={<MaskIcon />}
-        />
+        /> */}
 
         <ChatAction
           text={Locale.Chat.InputActions.Clear}
@@ -651,11 +674,11 @@ export function ChatActions(props: {
           }}
         />
 
-        <ChatAction
+        {/* <ChatAction
           onClick={() => setShowModelSelector(true)}
           text={currentModelName}
           icon={<RobotIcon />}
-        />
+        /> */}
 
         {showModelSelector && (
           <Selector
@@ -786,7 +809,7 @@ export function ChatActions(props: {
             icon={<PluginIcon />}
           />
         )} */}
-        <ChatAction
+        {/* <ChatAction
           onClick={() => {
             changeChatMode();
             if (chatMode === ChatMode.cansual) {
@@ -797,6 +820,23 @@ export function ChatActions(props: {
           }}
           text={chatMode === ChatMode.cansual ? "闲聊模式" : "专业模式"}
           icon={chatMode === ChatMode.cansual ? <PluginIcon /> : <StyleIcon />}
+        /> */}
+
+        <ChatActionWithoutShrink
+          onClick={() => {
+            changeChatMode();
+            if (chatMode === ChatMode.cansual) {
+              setChatMode(ChatMode.professional);
+            } else {
+              setChatMode(ChatMode.cansual);
+            }
+          }}
+          classNames={
+            chatMode === ChatMode.professional
+              ? styles["chat-input-action-mode-change"]
+              : ""
+          }
+          text={chatMode === ChatMode.cansual ? "闲聊模式" : "专业模式"}
         />
 
         {showPluginSelector && (

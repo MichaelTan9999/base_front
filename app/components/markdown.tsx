@@ -25,7 +25,7 @@ import { IconButton } from "./button";
 import { useAppConfig } from "../store/config";
 import clsx from "clsx";
 
-import { Dataframe, Graph } from "bi-graph";
+import { Dataframe, Graph } from "bi_graph";
 
 export function Mermaid(props: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -331,7 +331,7 @@ function tryWrapHtmlCode(text: string) {
     );
 }
 
-function _MarkDownContent(props: { content: string }) {
+function XMarkDownContent(props: { content: string }) {
   const escapedContent = useMemo(() => {
     return tryWrapHtmlCode(escapeBrackets(props.content));
   }, [props.content]);
@@ -352,7 +352,7 @@ function _MarkDownContent(props: { content: string }) {
       components={{
         pre: PreCode,
         code: CustomCode,
-        p: (pProps) => <p {...pProps} dir="auto" style={{ color: "red" }} />,
+        p: (pProps) => <p {...pProps} dir="auto" />,
         a: (aProps) => {
           const href = aProps.href || "";
           if (/\.(aac|mp3|opus|wav)$/.test(href)) {
@@ -370,7 +370,7 @@ function _MarkDownContent(props: { content: string }) {
             );
           }
           const isInternal = /^\/#/i.test(href);
-          const target = isInternal ? "_self" : aProps.target ?? "_blank";
+          const target = isInternal ? "_self" : (aProps.target ?? "_blank");
           return <a {...aProps} target={target} />;
         },
       }}
@@ -380,7 +380,7 @@ function _MarkDownContent(props: { content: string }) {
   );
 }
 
-export const MarkdownContent = React.memo(_MarkDownContent);
+export const MarkdownContent = React.memo(XMarkDownContent);
 
 export function Markdown(
   props: {

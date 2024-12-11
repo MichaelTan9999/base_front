@@ -26,7 +26,6 @@ import BreakIcon from "../icons/break.svg";
 import SettingsIcon from "../icons/chat-settings.svg";
 import DeleteIcon from "../icons/clear.svg";
 import PinIcon from "../icons/pin.svg";
-import EditIcon from "../icons/rename.svg";
 import ConfirmIcon from "../icons/confirm.svg";
 import CloseIcon from "../icons/close.svg";
 import CancelIcon from "../icons/cancel.svg";
@@ -43,7 +42,8 @@ import StyleIcon from "../icons/palette.svg";
 import ShortcutkeyIcon from "../icons/shortcutkey.svg";
 import ReloadIcon from "../icons/reload.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
-import HarborCityIcon from "../icons/harbour.svg";
+import ShenzhenHrssIcon from "../icons/shenzhenHrss.svg";
+
 import {
   ChatMessage,
   SubmitKey,
@@ -88,7 +88,6 @@ import {
   Modal,
   Selector,
   showConfirm,
-  showPrompt,
   showToast,
 } from "./ui-lib";
 import { useNavigate } from "react-router-dom";
@@ -109,7 +108,6 @@ import { prettyObject } from "../utils/format";
 import { ExportMessageModal } from "./exporter";
 import { getClientConfig } from "../config/client";
 import { useAllModels } from "../utils/hooks";
-import { MultimodalContent } from "../client/api";
 
 import { ClientApi } from "../client/api";
 import { createTTSPlayer } from "../utils/audio";
@@ -1011,7 +1009,7 @@ export function ShortcutKeyModal(props: { onClose: () => void }) {
   );
 }
 
-function _Chat() {
+function XChat() {
   type RenderMessage = ChatMessage & { preview?: boolean };
 
   const chatStore = useChatStore();
@@ -1810,7 +1808,7 @@ function _Chat() {
                         <div className={styles["chat-message-header"]}>
                           <div className={styles["chat-message-avatar"]}>
                             <div className={styles["chat-message-edit"]}>
-                              <IconButton
+                              {/* <IconButton
                                 icon={<EditIcon />}
                                 aria={Locale.Chat.Actions.Edit}
                                 onClick={async () => {
@@ -1847,17 +1845,17 @@ function _Chat() {
                                     },
                                   );
                                 }}
-                              ></IconButton>
+                              ></IconButton> */}
                             </div>
                             {isUser ? (
                               <Avatar avatar={config.avatar} />
                             ) : (
-                              <HarborCityIcon />
+                              <ShenzhenHrssIcon />
                             )}
                           </div>
                           {!isUser && (
                             <div className={styles["chat-model-name"]}>
-                              harbor-city
+                              智慧问策
                             </div>
                           )}
 
@@ -1971,6 +1969,7 @@ function _Chat() {
                             defaultShow={i >= messages.length - 6}
                           />
                           {getMessageImages(message).length == 1 && (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                               className={styles["chat-message-item-image"]}
                               src={getMessageImages(message)[0]}
@@ -1989,6 +1988,7 @@ function _Chat() {
                             >
                               {getMessageImages(message).map((image, index) => {
                                 return (
+                                  // eslint-disable-next-line @next/next/no-img-element
                                   <img
                                     className={
                                       styles["chat-message-item-image-multi"]
@@ -2147,5 +2147,5 @@ function _Chat() {
 export function Chat() {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();
-  return <_Chat key={session.id}></_Chat>;
+  return <XChat key={session.id}></XChat>;
 }

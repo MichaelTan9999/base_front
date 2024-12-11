@@ -10,7 +10,7 @@ import DeleteIcon from "../icons/delete.svg";
 import MaskIcon from "../icons/mask.svg";
 import DragIcon from "../icons/drag.svg";
 import DiscoveryIcon from "../icons/discovery.svg";
-import HarborCityIcon from "../icons/harbour.svg";
+import ShenzhenHrssIcon from "../icons/shenzhenHrss.svg";
 
 import Locale from "../locales";
 
@@ -231,9 +231,9 @@ export function SideBar(props: { className?: string }) {
       {...props}
     >
       <SideBarHeader
-        title="NextChat"
+        title="智慧问策"
         subTitle="Build your own AI assistant."
-        logo={<HarborCityIcon />}
+        logo={<ShenzhenHrssIcon />}
         shouldNarrow={shouldNarrow}
       >
         <div className={styles["sidebar-header-bar"]}>

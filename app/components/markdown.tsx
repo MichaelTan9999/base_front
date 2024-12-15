@@ -25,8 +25,6 @@ import { IconButton } from "./button";
 import { useAppConfig } from "../store/config";
 import clsx from "clsx";
 
-import { Dataframe, Graph } from "bi_graph";
-
 export function Mermaid(props: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [hasError, setHasError] = useState(false);
@@ -108,7 +106,7 @@ export function PreCode(props: { children: any }) {
     props.children?.[0]?.props?.children?.[0],
   );
 
-  console.log("PreCode, isGraph", isGraph);
+  console.log("PreCode", props.children?.[0]?.props?.children?.[0]);
 
   const config = useAppConfig();
   const enableArtifacts =
@@ -241,34 +239,34 @@ function CustomCode(props: { children: any; className?: string }) {
   // }
 
   if (isGraph) {
-    try {
-      const data = (props.children?.[0]).match(dataReg);
-      return (
-        <div style={{ minWidth: "300px" }}>
-          <Graph data={JSON.parse(data[1])} style={{}} />
-        </div>
-      );
-    } catch {
-      console.log("failed");
-    }
+    // try {
+    //   const data = (props.children?.[0]).match(dataReg);
+    //   return (
+    //     <div style={{ minWidth: "300px" }}>
+    //       <Graph data={JSON.parse(data[1])} style={{}} />
+    //     </div>
+    //   );
+    // } catch {
+    //   console.log("failed");
+    // }
 
-    return <div>特殊块捕获</div>;
+    return <div>特殊块捕获 graph</div>;
   }
 
   if (isDataframe) {
-    try {
-      const data = (props.children?.[0]).match(dataReg);
-      console.log("dataframe 数据：", JSON.parse(data[1]));
-      return (
-        <div>
-          <Dataframe data={JSON.parse(data[1])} />
-        </div>
-      );
-    } catch {
-      console.log("failed");
-    }
+    // try {
+    //   const data = (props.children?.[0]).match(dataReg);
+    //   console.log("dataframe 数据：", JSON.parse(data[1]));
+    //   return (
+    //     <div>
+    //       <Dataframe data={JSON.parse(data[1])} />
+    //     </div>
+    //   );
+    // } catch {
+    //   console.log("failed");
+    // }
 
-    return <div>特殊块捕获</div>;
+    return <div>特殊块捕获 dataframe</div>;
   }
 
   return (

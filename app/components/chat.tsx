@@ -36,10 +36,6 @@ import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
-import SizeIcon from "../icons/size.svg";
-import QualityIcon from "../icons/hd.svg";
-import StyleIcon from "../icons/palette.svg";
-import ShortcutkeyIcon from "../icons/shortcutkey.svg";
 import ReloadIcon from "../icons/reload.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
 import ShenzhenHrssIcon from "../icons/shenzhenHrss.svg";
@@ -54,7 +50,6 @@ import {
   Theme,
   useAppConfig,
   DEFAULT_TOPIC,
-  ModelType,
   usePluginStore,
 } from "../store";
 
@@ -66,7 +61,6 @@ import {
   getMessageTextContent,
   getMessageImages,
   isVisionModel,
-  isDalle3,
   safeLocalStorage,
 } from "../utils";
 
@@ -82,14 +76,7 @@ import Locale from "../locales";
 import { IconButton } from "./button";
 import styles from "./chat.module.scss";
 
-import {
-  List,
-  ListItem,
-  Modal,
-  Selector,
-  showConfirm,
-  showToast,
-} from "./ui-lib";
+import { List, ListItem, Modal, showConfirm, showToast } from "./ui-lib";
 import { useNavigate } from "react-router-dom";
 import {
   CHAT_PAGE_SIZE,
@@ -114,7 +101,6 @@ import { createTTSPlayer } from "../utils/audio";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
 
 import { isEmpty } from "lodash-es";
-import { getModelProvider } from "../utils/model";
 import { RealtimeChat } from "@/app/components/realtime-chat";
 import clsx from "clsx";
 
@@ -598,51 +584,73 @@ export function ChatActions(props: {
 
   return (
     <div className={styles["chat-input-actions"]}>
-      <>
-        {couldStop && (
-          <ChatAction
-            onClick={stopAll}
-            text={Locale.Chat.InputActions.Stop}
-            icon={<StopIcon />}
-          />
-        )}
-        {!props.hitBottom && (
-          <ChatAction
-            onClick={props.scrollToBottom}
-            text={Locale.Chat.InputActions.ToBottom}
-            icon={<BottomIcon />}
-          />
-        )}
-        {props.hitBottom && (
-          <ChatAction
-            onClick={props.showPromptModal}
-            text={Locale.Chat.InputActions.Settings}
-            icon={<SettingsIcon />}
-          />
-        )}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "start", gap: "5px" }}>
+          {couldStop && (
+            <ChatAction
+              onClick={stopAll}
+              text={Locale.Chat.InputActions.Stop}
+              icon={<StopIcon />}
+            />
+          )}
+          {!props.hitBottom && (
+            <ChatAction
+              onClick={props.scrollToBottom}
+              text={Locale.Chat.InputActions.ToBottom}
+              icon={<BottomIcon />}
+            />
+          )}
+          {props.hitBottom && (
+            <ChatAction
+              onClick={props.showPromptModal}
+              text={Locale.Chat.InputActions.Settings}
+              icon={<SettingsIcon />}
+            />
+          )}
 
-        {showUploadImage && (
+          {showUploadImage && (
+            <ChatAction
+              onClick={props.uploadImage}
+              text={Locale.Chat.InputActions.UploadImage}
+              icon={props.uploading ? <LoadingButtonIcon /> : <ImageIcon />}
+            />
+          )}
           <ChatAction
-            onClick={props.uploadImage}
-            text={Locale.Chat.InputActions.UploadImage}
-            icon={props.uploading ? <LoadingButtonIcon /> : <ImageIcon />}
+            onClick={nextTheme}
+            text={Locale.Chat.InputActions.Theme[theme]}
+            icon={
+              <>
+                {theme === Theme.Auto ? (
+                  <AutoIcon />
+                ) : theme === Theme.Light ? (
+                  <LightIcon />
+                ) : theme === Theme.Dark ? (
+                  <DarkIcon />
+                ) : null}
+              </>
+            }
           />
-        )}
-        <ChatAction
-          onClick={nextTheme}
-          text={Locale.Chat.InputActions.Theme[theme]}
-          icon={
-            <>
-              {theme === Theme.Auto ? (
-                <AutoIcon />
-              ) : theme === Theme.Light ? (
-                <LightIcon />
-              ) : theme === Theme.Dark ? (
-                <DarkIcon />
-              ) : null}
-            </>
-          }
-        />
+          <ChatAction
+            text={Locale.Chat.InputActions.Clear}
+            icon={<BreakIcon />}
+            onClick={() => {
+              chatStore.updateTargetSession(session, (session) => {
+                if (session.clearContextIndex === session.messages.length) {
+                  session.clearContextIndex = undefined;
+                } else {
+                  session.clearContextIndex = session.messages.length;
+                  session.memoryPrompt = ""; // will clear memory
+                }
+              });
+            }}
+          />
+        </div>
 
         {/* <ChatAction
           onClick={props.showPromptHints}
@@ -658,28 +666,13 @@ export function ChatActions(props: {
           icon={<MaskIcon />}
         /> */}
 
-        <ChatAction
-          text={Locale.Chat.InputActions.Clear}
-          icon={<BreakIcon />}
-          onClick={() => {
-            chatStore.updateTargetSession(session, (session) => {
-              if (session.clearContextIndex === session.messages.length) {
-                session.clearContextIndex = undefined;
-              } else {
-                session.clearContextIndex = session.messages.length;
-                session.memoryPrompt = ""; // will clear memory
-              }
-            });
-          }}
-        />
-
         {/* <ChatAction
           onClick={() => setShowModelSelector(true)}
           text={currentModelName}
           icon={<RobotIcon />}
         /> */}
 
-        {showModelSelector && (
+        {/* {showModelSelector && (
           <Selector
             defaultSelectedValue={`${currentModel}@${currentProviderName}`}
             items={models.map((m) => ({
@@ -712,17 +705,17 @@ export function ChatActions(props: {
               }
             }}
           />
-        )}
+        )} */}
 
-        {isDalle3(currentModel) && (
+        {/* {isDalle3(currentModel) && (
           <ChatAction
             onClick={() => setShowSizeSelector(true)}
             text={currentSize}
             icon={<SizeIcon />}
           />
-        )}
+        )} */}
 
-        {showSizeSelector && (
+        {/* {showSizeSelector && (
           <Selector
             defaultSelectedValue={currentSize}
             items={dalle3Sizes.map((m) => ({
@@ -739,17 +732,17 @@ export function ChatActions(props: {
               showToast(size);
             }}
           />
-        )}
+        )} */}
 
-        {isDalle3(currentModel) && (
+        {/* {isDalle3(currentModel) && (
           <ChatAction
             onClick={() => setShowQualitySelector(true)}
             text={currentQuality}
             icon={<QualityIcon />}
           />
-        )}
+        )} */}
 
-        {showQualitySelector && (
+        {/* {showQualitySelector && (
           <Selector
             defaultSelectedValue={currentQuality}
             items={dalle3Qualitys.map((m) => ({
@@ -766,17 +759,17 @@ export function ChatActions(props: {
               showToast(quality);
             }}
           />
-        )}
+        )} */}
 
-        {isDalle3(currentModel) && (
+        {/* {isDalle3(currentModel) && (
           <ChatAction
             onClick={() => setShowStyleSelector(true)}
             text={currentStyle}
             icon={<StyleIcon />}
           />
-        )}
+        )} */}
 
-        {showStyleSelector && (
+        {/* {showStyleSelector && (
           <Selector
             defaultSelectedValue={currentStyle}
             items={dalle3Styles.map((m) => ({
@@ -793,7 +786,7 @@ export function ChatActions(props: {
               showToast(style);
             }}
           />
-        )}
+        )} */}
 
         {/* {showPlugins(currentProviderName, currentModel) && (
           <ChatAction
@@ -838,7 +831,7 @@ export function ChatActions(props: {
           text={chatMode === ChatMode.cansual ? "闲聊模式" : "专业模式"}
         />
 
-        {showPluginSelector && (
+        {/* {showPluginSelector && (
           <Selector
             multiple
             defaultSelectedValue={chatStore.currentSession().mask?.plugin}
@@ -853,16 +846,16 @@ export function ChatActions(props: {
               });
             }}
           />
-        )}
+        )} */}
 
-        {!isMobileScreen && (
+        {/* {!isMobileScreen && (
           <ChatAction
             onClick={() => props.setShowShortcutKeyModal(true)}
             text={Locale.Chat.ShortcutKey.Title}
             icon={<ShortcutkeyIcon />}
           />
-        )}
-      </>
+        )} */}
+      </div>
       <div className={styles["chat-input-actions-end"]}>
         {config.realtimeConfig.enable && (
           <ChatAction

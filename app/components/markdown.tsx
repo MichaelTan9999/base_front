@@ -25,6 +25,8 @@ import { IconButton } from "./button";
 import { useAppConfig } from "../store/config";
 import clsx from "clsx";
 
+import { Graph, Dataframe } from "@michaeltan9999/bi_graph";
+
 export function Mermaid(props: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [hasError, setHasError] = useState(false);
@@ -99,6 +101,12 @@ export function PreCode(props: { children: any }) {
     }
   }, 600);
 
+  const match = /language-(\w+)/.exec(
+    props.children?.[0]?.props.className || "",
+  );
+
+  const isRemovePreTag = match?.[1] === "bigraph" || false;
+
   const config = useAppConfig();
   const enableArtifacts =
     session.mask?.enableArtifacts !== false && config.enableArtifacts;
@@ -132,19 +140,23 @@ export function PreCode(props: { children: any }) {
 
   return (
     <>
-      <pre ref={ref}>
-        <span
-          className="copy-code-button"
-          onClick={() => {
-            if (ref.current) {
-              copyToClipboard(
-                ref.current.querySelector("code")?.innerText ?? "",
-              );
-            }
-          }}
-        ></span>
-        {props.children}
-      </pre>
+      {isRemovePreTag ? (
+        props.children
+      ) : (
+        <pre ref={ref}>
+          <span
+            className="copy-code-button"
+            onClick={() => {
+              if (ref.current) {
+                copyToClipboard(
+                  ref.current.querySelector("code")?.innerText ?? "",
+                );
+              }
+            }}
+          />
+          {props.children}
+        </pre>
+      )}
       {mermaidCode.length > 0 && (
         <Mermaid code={mermaidCode} key={mermaidCode} />
       )}
@@ -210,6 +222,26 @@ function CustomCode(props: { children: any; className?: string }) {
     }
     return null;
   };
+
+  const match = /language-(\w+)/.exec(props.className || "");
+
+  if (match?.[1] === "bigraph") {
+    try {
+      const bigraph = JSON.parse(props.children[0].trim());
+
+      switch (bigraph.type) {
+        case "graph":
+          return <Graph data={bigraph.data} />;
+        case "dataframe":
+          return <Dataframe data={bigraph.data} />;
+        default:
+          return <div>待实现</div>;
+      }
+    } catch {
+      return <div>渲染中</div>;
+    }
+  }
+
   return (
     <>
       <code
@@ -231,7 +263,8 @@ function CustomCode(props: { children: any; className?: string }) {
 function escapeBrackets(text: string) {
   const pattern =
     /(```[\s\S]*?```|`.*?`)|\\\[([\s\S]*?[^\\])\\\]|\\\((.*?)\\\)/g;
-  return text.replace(
+
+  const value = text.replace(
     pattern,
     (match, codeBlock, squareBracket, roundBracket) => {
       if (codeBlock) {
@@ -244,6 +277,8 @@ function escapeBrackets(text: string) {
       return match;
     },
   );
+  // console.log("escapeBrackets: ", value);
+  return value;
 }
 
 function tryWrapHtmlCode(text: string) {
@@ -267,7 +302,7 @@ function tryWrapHtmlCode(text: string) {
     );
 }
 
-function _MarkDownContent(props: { content: string }) {
+function XMarkDownContent(props: { content: string }) {
   const escapedContent = useMemo(() => {
     return tryWrapHtmlCode(escapeBrackets(props.content));
   }, [props.content]);
@@ -306,7 +341,7 @@ function _MarkDownContent(props: { content: string }) {
             );
           }
           const isInternal = /^\/#/i.test(href);
-          const target = isInternal ? "_self" : aProps.target ?? "_blank";
+          const target = isInternal ? "_self" : (aProps.target ?? "_blank");
           return <a {...aProps} target={target} />;
         },
       }}
@@ -316,7 +351,7 @@ function _MarkDownContent(props: { content: string }) {
   );
 }
 
-export const MarkdownContent = React.memo(_MarkDownContent);
+export const MarkdownContent = React.memo(XMarkDownContent);
 
 export function Markdown(
   props: {

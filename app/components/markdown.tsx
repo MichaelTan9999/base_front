@@ -101,14 +101,11 @@ export function PreCode(props: { children: any }) {
     }
   }, 600);
 
-  const isGraph = /class='graph'/.test(
-    props.children?.[0]?.props?.children?.[0],
-  );
-  const isDataframe = /class='dataframe'/.test(
-    props.children?.[0]?.props?.children?.[0],
+  const match = /language-(\w+)/.exec(
+    props.children?.[0]?.props.className || "",
   );
 
-  console.log("PreCode", props.children?.[0]?.props?.children?.[0]);
+  const isRemovePreTag = match?.[1] === "bigraph" || false;
 
   const config = useAppConfig();
   const enableArtifacts =
@@ -143,7 +140,7 @@ export function PreCode(props: { children: any }) {
 
   return (
     <>
-      {isGraph || isDataframe ? (
+      {isRemovePreTag ? (
         props.children
       ) : (
         <pre ref={ref}>
@@ -226,48 +223,23 @@ function CustomCode(props: { children: any; className?: string }) {
     return null;
   };
 
-  const isGraph = /class='graph'/.test(props.children?.[0]);
-  const isDataframe = /class='dataframe'/.test(props.children?.[0]);
+  const match = /language-(\w+)/.exec(props.className || "");
 
-  const dataReg = /data='(.*?)'/;
-
-  // const data = (props.children?.[0]).match(dataReg)
-
-  // try {
-  //   console.log('data:\n', JSON.parse(data[1]));
-  //   return <div>测试</div>;
-  // } catch (e) {
-  //   console.log('parse failed');
-  // }
-
-  if (isGraph) {
+  if (match?.[1] === "bigraph") {
     try {
-      const data = (props.children?.[0]).match(dataReg);
-      return (
-        <div style={{ minWidth: "300px" }}>
-          <Graph data={JSON.parse(data[1])} style={{}} />
-        </div>
-      );
+      const bigraph = JSON.parse(props.children[0].trim());
+
+      switch (bigraph.type) {
+        case "graph":
+          return <Graph data={bigraph.data} />;
+        case "dataframe":
+          return <Dataframe data={bigraph.data} />;
+        default:
+          return <div>待实现</div>;
+      }
     } catch {
-      console.log("failed");
+      return <div>渲染中</div>;
     }
-
-    return <div>特殊块捕获 graph</div>;
-  }
-
-  if (isDataframe) {
-    try {
-      const data = (props.children?.[0]).match(dataReg);
-      return (
-        <div>
-          <Dataframe data={JSON.parse(data[1])} />
-        </div>
-      );
-    } catch {
-      console.log("failed");
-    }
-
-    return <div>特殊块捕获 dataframe</div>;
   }
 
   return (
